@@ -1,4 +1,4 @@
-# TRANS RIGHTS :P
+# TRANS FOX GIRL RIGHTS :P
 
 import argparse
 import datetime
