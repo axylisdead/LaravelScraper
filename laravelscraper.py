@@ -1,3 +1,5 @@
+# TRANS RIGHTS :P
+
 import argparse
 import datetime
 import os
