@@ -4,6 +4,7 @@
 
 # Description
 LaravelScraper is a small script to scrape Laravel error pages using the Shodan API and extract valuable information
+<br>
 It is incredibly useful for gaining access to random databases and credentials for different services
 
 Features:
