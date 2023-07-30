@@ -9,8 +9,11 @@ import pyfiglet
 import urllib3
 import sys
 import socket
+from helper import scraper as app
 from bs4 import BeautifulSoup
 from contextlib import redirect_stdout
+
+#from test import read_txt_file
 
 SHODAN_API_KEY = None
 folder_name = None
@@ -32,6 +35,7 @@ def print_help_menu():
     print("-k or --api_key (REQUIRED) = Your Shodan API (k)ey. You need one for this to work.")
     print("-p or --page = (P)age. Determines the page of your results as Shodan only downloads 100 at a time.")
     print("-o or --output = (O)utput. Print everything on the console to a file of your choice.")
+    print("-t or --telegragm = (T)sends to your telegragm channel, also activate the -d option.")
 
 
 def search_shodan(page=1):
@@ -40,6 +44,8 @@ def search_shodan(page=1):
     parser.add_argument("-k", "--api_key", help="(REQUIRED) Your Shodan API (k)ey. You need one for this to work.", required=True)
     parser.add_argument("-p", "--page", type=int, default=1, help="Determines the page of your results as Shodan only downloads 100 at a time.")
     parser.add_argument("-o", "--output", help="Print everything on the console to a file of your choice.", default=None)
+    parser.add_argument("-d", "--database", help="Saves the data into a sqlite db", default=None)
+    parser.add_argument("-t","--telegragm", nargs=2, metavar=("token", "chatid"), help="Sends hits to your telegragm channel, also activate the -d option.")
     args = parser.parse_args()
 
     SHODAN_API_KEY = args.api_key
@@ -47,21 +53,40 @@ def search_shodan(page=1):
     query = 'http.title:"Whoops! There was an error" http.status:500'
 
     try:
+        if not args.telegragm is None:
+            if args.database is None:
+                print(f" ********          Telegragm Error: Also activate the -d switch to use this feature     ***************")
+                sys.exit(1)
+            if not len(args.telegragm) == 2:
+                print("**********          Telegragm Error: example -t Token chat-id.     ***************")
+                sys.exit(1)
+                
+        # maybe this should be 'how many pages?' then loop through them as --all is a pain?
         if args.page > 1:
             woofwoofwoofbarkbarkbark = requests.get(f"https://api.shodan.io/shodan/host/search?key={SHODAN_API_KEY}&query={query}&page={args.page}")
         else:
             woofwoofwoofbarkbarkbark = requests.get(f"https://api.shodan.io/shodan/host/search?key={SHODAN_API_KEY}&query={query}")
         results = woofwoofwoofbarkbarkbark.json()
         print(f"Shodan Results: {results['total']}")
-        return results, args.output, results['matches']
+
+        return results, args.output, args.database, args.telegragm, results['matches']
     except requests.exceptions.RequestException as e:
         print(f"Error connecting to Shodan API: {e}")
         sys.exit(1)
 
-def main():
+""" def main():
     bannerner_print()
-    results, output_file = search_shodan()
+    results, output_file, database = search_shodan()
 
+    if database:
+        file_name = "results.txt"
+        rawdata = read_txt_file(file_name)
+        db_file_name = "data.db"
+        # create json file with output data
+        hits = app.sortdata(rawdata)
+        sent2db = app.data2db(hits, db_file_name)
+        print("\n\033[0m[+] The results have been into the db")
+    
     if output_file:
         with open(output_file, "w") as output:
             matches = results['matches']
@@ -77,7 +102,7 @@ def main():
         extract_information()
 
     reset_terminal_color()
-
+ """
 def download_ip_ports(matches):
     dt = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"laravelscraper_{dt}.txt"
@@ -107,8 +132,13 @@ def download_html_files(filename):
         ip_port = ip_port.strip()
         if not ip_port:
             continue
-
-        ip, port = ip_port.split(":")
+        # Handle IPV6 gracefully
+        ip_details = app.ipdetails(ip_port)
+        if ip_details:
+            ip = ip_details[0]
+            port = ip_details[1]
+        else:
+            continue
         url = f"http://{ip}:{port}"
         html_filename = os.path.join(folder_name, f"{ip}.html")
 
@@ -189,8 +219,8 @@ def reset_terminal_color():
 
 def main():
     bannerner_print()
-    results, output_file, matches = search_shodan()
-
+    results, output_file, database, send2tele, matches = search_shodan()
+        
     if output_file:
         with open(output_file, "w") as output:
             dacoolfile = download_ip_ports(matches)
@@ -198,7 +228,16 @@ def main():
             with redirect_stdout(output):
                 extract_information()
         print("\n\033[0m[+] The results have been saved to", output_file)
-
+        
+    if database:
+        db_file_name = "data.db"
+        hits = app.sortdata(output_file)
+        sent2db = app.data2db(hits, db_file_name)
+        print("\n\033[0m[+] The results have been into the database")
+    
+    if send2tele:
+        app.send2tele(send2tele[0],send2tele[1])
+    
     else:
         dacoolfile = download_ip_ports(matches)
         download_html_files(dacoolfile)
