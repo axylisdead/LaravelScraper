@@ -42,7 +42,7 @@ contextlib
 # Usage
 Run normally: ```python laravelscraper.py -k YOUR_SHODAN_API_KEY_HERE```
 Add results to sqllite3: -o laravelscraper_index.txt -d  dbname -o output.txt
-Send results to Telegragm: -o laravelscraper_index.txt -t YOUR_BOT_TOKEN YOUR_CHAT_ID -d DB_NAME -o OUTPUT_FILENAME
+Send results to telegram: -o laravelscraper_index.txt -t YOUR_BOT_TOKEN YOUR_CHAT_ID -d DB_NAME -o OUTPUT_FILENAME
 <br>
 Output the results to a file called output.txt: ```python laravelscraper.py -k YOUR_SHODAN_API_KEY_HERE -o output.txt```
 <br>
@@ -53,11 +53,11 @@ Scroll through pages of Shodan results to page 13: ```python laravelscraper.py -
 - ```-p``` or ```--page``` | Shodan only prints 100 results by default per page, so if you want more results, change this parameter to go to a different page.
 - ```-o``` or ```--output``` | Outputs whatever results to stdout AS WELL AS to a file of your choice.
 - ```-d``` or ```--database``` | Saves the hits to a database.
-- ```-t``` or ```--telegragm``` | Sends the hits to your telegragm bot.
+- ```-t``` or ```--telegram``` | Sends the hits to your telegram bot.
 
 # To Do
 - [x] Add feature to save all results to a local SQLite database or a CSV file
-- [x] Add telegragm feature
+- [x] Add telegram feature
 - [ ] Allow --all argument to download all results from Shodan (i tried implementing this but it gave me a headache)
 - [ ] Intergrate with other services (Hunter, CriminalIP, ZoomEye etc)
 - [ ] Implement automatic testing of DBs, SMTP logins, AWS keys to test if they work

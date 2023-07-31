@@ -35,7 +35,7 @@ def print_help_menu():
     print("-k or --api_key (REQUIRED) = Your Shodan API (k)ey. You need one for this to work.")
     print("-p or --page = (P)age. Determines the page of your results as Shodan only downloads 100 at a time.")
     print("-o or --output = (O)utput. Print everything on the console to a file of your choice.")
-    print("-t or --telegragm = (T)sends to your telegragm channel, also activate the -d option.")
+    print("-t or --telegram = (T)sends to your telegram channel, also activate the -d option.")
 
 
 def search_shodan(page=1):
@@ -45,7 +45,7 @@ def search_shodan(page=1):
     parser.add_argument("-p", "--page", type=int, default=1, help="Determines the page of your results as Shodan only downloads 100 at a time.")
     parser.add_argument("-o", "--output", help="Print everything on the console to a file of your choice.", default=None)
     parser.add_argument("-d", "--database", help="Saves the data into a sqlite db", default=None)
-    parser.add_argument("-t","--telegragm", nargs=2, metavar=("token", "chatid"), help="Sends hits to your telegragm channel, also activate the -d option.")
+    parser.add_argument("-t","--telegram", nargs=2, metavar=("token", "chatid"), help="Sends hits to your telegram channel, also activate the -d option.")
     args = parser.parse_args()
 
     SHODAN_API_KEY = args.api_key
@@ -53,12 +53,12 @@ def search_shodan(page=1):
     query = 'http.title:"Whoops! There was an error" http.status:500'
 
     try:
-        if not args.telegragm is None:
+        if not args.telegram is None:
             if args.database is None:
-                print(f" ********          Telegragm Error: Also activate the -d switch to use this feature     ***************")
+                print(f" ********          telegram Error: Also activate the -d switch to use this feature     ***************")
                 sys.exit(1)
-            if not len(args.telegragm) == 2:
-                print("**********          Telegragm Error: example -t Token chat-id.     ***************")
+            if not len(args.telegram) == 2:
+                print("**********          telegram Error: example -t Token chat-id.     ***************")
                 sys.exit(1)
                 
         # maybe this should be 'how many pages?' then loop through them as --all is a pain?
@@ -69,7 +69,7 @@ def search_shodan(page=1):
         results = woofwoofwoofbarkbarkbark.json()
         print(f"Shodan Results: {results['total']}")
 
-        return results, args.output, args.database, args.telegragm, results['matches']
+        return results, args.output, args.database, args.telegram, results['matches']
     except requests.exceptions.RequestException as e:
         print(f"Error connecting to Shodan API: {e}")
         sys.exit(1)
