@@ -52,12 +52,12 @@ Scroll through pages of Shodan results to page 13: ```python laravelscraper.py -
 - ```-k``` or ```--api_key``` | This is required. This is where you put your Shodan API key.
 - ```-p``` or ```--page``` | Shodan only prints 100 results by default per page, so if you want more results, change this parameter to go to a different page.
 - ```-o``` or ```--output``` | Outputs whatever results to stdout AS WELL AS to a file of your choice.
-- ```-d``` or ```--database``` | Saves the hits to a database.
-- ```-t``` or ```--telegram``` | Sends the hits to your telegram bot.
+- ```-d``` or ```--database``` | Saves the hits to a local SQLite database
+- ```-t``` or ```--telegram``` | Sends the hits to your Telegram bot. Please follow -t with your Telegram Chat ID for your bot.
 
 # To Do
 - [x] Add feature to save all results to a local SQLite database or a CSV file
-- [x] Add telegram feature
+- [x] Add Telegram feature
 - [ ] Allow --all argument to download all results from Shodan (i tried implementing this but it gave me a headache)
 - [ ] Intergrate with other services (Hunter, CriminalIP, ZoomEye etc)
 - [ ] Implement automatic testing of DBs, SMTP logins, AWS keys to test if they work
@@ -71,3 +71,4 @@ This code was proudly written and published under the <a href=https://plusnigger
 
 # Credits
 All work was done by me, Lodzie Kotekya. You can find me on <a href="https://t.me/lodzie">Telegram</a>
+Many contributions such as local database saving and the Telegram bot were done by <a href="https://github.com/nelly113113">nelly113113</a>. Many thanks to them.
