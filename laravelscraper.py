@@ -46,7 +46,7 @@ def search_shodan(page=1):
     parser.add_argument("-p", "--page", type=int, default=1, help="Determines the page of your results as Shodan only downloads 100 at a time.")
     parser.add_argument("-o", "--output", help="Print everything on the console to a file of your choice.", default=None)
     parser.add_argument("-d", "--database", help="Saves the data into a SQLite DB", default=None)
-    parser.add_argument("-t","--telegram", nargs=2, metavar=("token", "chatid"), help="Sends the hits to your Telegram bot. Please follow -t with your Telegram bot token and your chat ID seperated by a space, this must be used in conjunction with -d"
+    parser.add_argument("-t","--telegram", nargs=2, metavar=("token", "chatid"), help="Sends the hits to your Telegram bot. Please follow -t with your Telegram bot token and your chat ID seperated by a space, this must be used in conjunction with -d")
     args = parser.parse_args()
 
     SHODAN_API_KEY = args.api_key
