@@ -35,7 +35,8 @@ def print_help_menu():
     print("-k or --api_key (REQUIRED) = Your Shodan API (k)ey. You need one for this to work.")
     print("-p or --page = (P)age. Determines the page of your results as Shodan only downloads 100 at a time.")
     print("-o or --output = (O)utput. Print everything on the console to a file of your choice.")
-    print("-t or --telegram = (T)sends to your telegram channel, also activate the -d option.")
+    print("-d or --database = Saves all of the data to an SQLite DB")
+    print("-t or --telegram = Sends to your (T)elegram channel, also activate the -d option.")
 
 
 def search_shodan(page=1):
@@ -45,7 +46,7 @@ def search_shodan(page=1):
     parser.add_argument("-p", "--page", type=int, default=1, help="Determines the page of your results as Shodan only downloads 100 at a time.")
     parser.add_argument("-o", "--output", help="Print everything on the console to a file of your choice.", default=None)
     parser.add_argument("-d", "--database", help="Saves the data into a sqlite db", default=None)
-    parser.add_argument("-t","--telegram", nargs=2, metavar=("token", "chatid"), help="Sends hits to your telegram channel, also activate the -d option.")
+    parser.add_argument("-t","--telegram", nargs=2, metavar=("token", "chatid"), help="Sends hits to your Telegram channel, also activate the -d option.")
     args = parser.parse_args()
 
     SHODAN_API_KEY = args.api_key
@@ -55,10 +56,10 @@ def search_shodan(page=1):
     try:
         if not args.telegram is None:
             if args.database is None:
-                print(f" ********          telegram Error: Also activate the -d switch to use this feature     ***************")
+                print(f" ********          Telegram Error: Also activate the -d switch to use this feature     ***************")
                 sys.exit(1)
             if not len(args.telegram) == 2:
-                print("**********          telegram Error: example -t Token chat-id.     ***************")
+                print("**********          Telegram Error: example -t Token chat-id.     ***************")
                 sys.exit(1)
                 
         # maybe this should be 'how many pages?' then loop through them as --all is a pain?
