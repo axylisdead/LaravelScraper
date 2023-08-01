@@ -36,7 +36,7 @@ def print_help_menu():
     print("-p or --page = (P)age. Determines the page of your results as Shodan only downloads 100 at a time.")
     print("-o or --output = (O)utput. Print everything on the console to a file of your choice.")
     print("-d or --database = Saves all of the data to an SQLite DB")
-    print("-t or --telegram = Sends to your (T)elegram channel, also activate the -d option.")
+    print("-t or --telegram = Sends the hits to your (T)elegram bot. Please follow -t with your Telegram bot token and your chat ID (seperated by a space), this must be used in conjunction with -d")
 
 
 def search_shodan(page=1):
