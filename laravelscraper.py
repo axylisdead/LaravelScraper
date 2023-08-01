@@ -3,17 +3,15 @@
 import argparse
 import datetime
 import os
-import requests
 import re
 import pyfiglet
 import urllib3
 import sys
 import socket
+import requests
 from helper import scraper as app
 from bs4 import BeautifulSoup
 from contextlib import redirect_stdout
-
-#from test import read_txt_file
 
 SHODAN_API_KEY = None
 folder_name = None
@@ -32,12 +30,11 @@ def print_help_menu():
     print("LaravelScraper (by Lodzie Kotekya)")
     print("A script to scrape Laravel error pages using the Shodan API and extract valuable information.")
     print("Arguments:")
-    print("-k or --api_key (REQUIRED) = Your Shodan API (k)ey. You need one for this to work.")
-    print("-p or --page = (P)age. Determines the page of your results as Shodan only downloads 100 at a time.")
-    print("-o or --output = (O)utput. Print everything on the console to a file of your choice.")
-    print("-d or --database = Saves all of the data to an SQLite (D)B")
-    print("-t or --telegram = Sends the hits to your (T)elegram bot. Please follow -t with your Telegram bot token and your chat ID seperated by a space, this must be used in conjunction with -d")
-
+    print("-k or --api_key (REQUIRED) = Your Shodan API key. You need one for this to work.")
+    print("-p or --page = Page. Determines the page of your results as Shodan only downloads 100 at a time.")
+    print("-o or --output = Output. Print everything on the console to a file of your choice.")
+    print("-d or --database = Saves all of the data to an SQLite database.")
+    print("-t or --telegram = Sends the hits to your Telegram bot. Please follow -t with your Telegram bot token and your chat ID separated by a space. This must be used in conjunction with -d")
 
 def search_shodan(page=1):
     global SHODAN_API_KEY
@@ -75,35 +72,6 @@ def search_shodan(page=1):
         print(f"Error connecting to Shodan API: {e}")
         sys.exit(1)
 
-""" def main():
-    bannerner_print()
-    results, output_file, database = search_shodan()
-
-    if database:
-        file_name = "results.txt"
-        rawdata = read_txt_file(file_name)
-        db_file_name = "data.db"
-        # create json file with output data
-        hits = app.sortdata(rawdata)
-        sent2db = app.data2db(hits, db_file_name)
-        print("\n\033[0m[+] The results have been into the db")
-    
-    if output_file:
-        with open(output_file, "w") as output:
-            matches = results['matches']
-            dacoolfile = download_ip_ports(matches)
-            download_html_files(dacoolfile)
-            with redirect_stdout(output):
-                extract_information()
-        print("\n\033[0m[+] The results have been saved to", output_file)
-
-    else:
-        dacoolfile = download_ip_ports(results['matches'])
-        download_html_files(dacoolfile)
-        extract_information()
-
-    reset_terminal_color()
- """
 def download_ip_ports(matches):
     dt = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"laravelscraper_{dt}.txt"
@@ -133,7 +101,6 @@ def download_html_files(filename):
         ip_port = ip_port.strip()
         if not ip_port:
             continue
-        # Handle IPV6 gracefully
         ip_details = app.ipdetails(ip_port)
         if ip_details:
             ip = ip_details[0]
@@ -218,30 +185,32 @@ def extract_information():
 def reset_terminal_color():
     print("\033[0m", end="")
 
+
 def main():
     bannerner_print()
-    results, output_file, database, send2tele, matches = search_shodan()
-        
+    results, output_file, database, telegram, matches = search_shodan()
+
     if output_file:
         with open(output_file, "w") as output:
-            dacoolfile = download_ip_ports(matches)
-            download_html_files(dacoolfile)
+            data_file = download_ip_ports(matches)
+            download_html_files(data_file)
             with redirect_stdout(output):
                 extract_information()
-        print("\n\033[0m[+] The results have been saved to", output_file)
-        
-    if database:
-        db_file_name = "data.db"
-        hits = app.sortdata(output_file)
-        sent2db = app.data2db(hits, db_file_name)
-        print("\n\033[0m[+] The results have been entered into the database")
-    
-    if send2tele:
-        app.send2tele(send2tele[0],send2tele[1])
-    
+        print("\n[+] The results have been saved to", output_file)
+
+        if database:
+            hits = app.sortdata(output_file)
+            if hits:
+                sent_to_db = app.data2db(hits, database)
+                if sent_to_db:
+                    print("[+] The results have been entered into the database")
+
+    elif database or telegram:
+        print("Error: Output file is required when using -d or -t options.")
+
     else:
-        dacoolfile = download_ip_ports(matches)
-        download_html_files(dacoolfile)
+        data_file = download_ip_ports(matches)
+        download_html_files(data_file)
         extract_information()
 
     reset_terminal_color()
