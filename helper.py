@@ -15,7 +15,8 @@ class scraper:
         except ValueError:
             return False
     
-    def data2db(data,filename):
+    
+    def data2db(data, filename):
         conn = sqlite3.connect(f'{filename}')
         cursor = conn.cursor()
         all_keys = set()
@@ -30,10 +31,21 @@ class scraper:
         '''
         cursor.execute(create_table_sql)
 
+        existing_columns = set()
+        cursor.execute(f"PRAGMA table_info(config_data)")
+        for column_info in cursor.fetchall():
+            existing_columns.add(column_info[1])
+
+        missing_columns = all_keys - existing_columns
+
+        for column in missing_columns:
+            alter_table_sql = f"ALTER TABLE config_data ADD COLUMN {column} TEXT"
+            cursor.execute(alter_table_sql)
+
         for server, config in data.items():
             insert_values = [server] + [config.get(key) for key in all_keys]
             insert_sql = f'''
-                INSERT INTO config_data (server, {", ".join(all_keys)})
+                INSERT OR REPLACE INTO config_data (server, {", ".join(all_keys)})
                 VALUES ({", ".join(["?"] * (len(all_keys) + 1))})
             '''
             cursor.execute(insert_sql, insert_values)
