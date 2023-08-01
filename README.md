@@ -73,4 +73,5 @@ This code was proudly written and published under the <a href=https://plusnigger
 
 # Credits
 All work was done by me, Lodzie Kotekya. You can find me on <a href="https://t.me/lodzie">Telegram</a>
+<br>
 Many contributions such as local database saving and the Telegram bot were done by <a href="https://github.com/nelly113113">nelly113113</a>. Many thanks to them.
