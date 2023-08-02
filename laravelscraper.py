@@ -172,15 +172,16 @@ def extract_information():
         processed_ips.add(ip)
         hostname = resolve_hostname(ip)
         print()
+         # Encode/Decode - handling strange chars on some hits 
         if sys.stdout.isatty():
-            print(f"\033[0m{ip}{' (' + hostname + ')' if hostname else ''}:")
+            print(f"\033[0m{ip}{' (' + hostname + ')' if hostname else ''}:".encode("utf-8").decode("utf-8"))
         else:
-            print(f"{ip}{' (' + hostname + ')' if hostname else ''}:")
+            print(f"{ip}{' (' + hostname + ')' if hostname else ''}:".encode("utf-8").decode("utf-8"))
         for keyword, value in info:
             if sys.stdout.isatty():
-                print(f"\033[92m[+] {keyword}: {value}")
+                print(f"\033[92m[+] {keyword}: {value}".encode("utf-8").decode("utf-8"))
             else:
-                print(f"[+] {keyword}: {value}")
+                print(f"[+] {keyword}: {value}".encode("utf-8").decode("utf-8"))
 
 def reset_terminal_color():
     print("\033[0m", end="")
@@ -191,7 +192,7 @@ def main():
     results, output_file, database, telegram, matches = search_shodan()
 
     if output_file:
-        with open(output_file, "w") as output:
+        with open(output_file, "w",encoding="utf-8") as output:
             data_file = download_ip_ports(matches)
             download_html_files(data_file)
             with redirect_stdout(output):
@@ -201,9 +202,14 @@ def main():
         if database:
             hits = app.sortdata(output_file)
             if hits:
-                sent_to_db = app.data2db(hits, database)
+                sent_to_db = app.data2db(hits, output_file)
                 if sent_to_db:
                     print("[+] The results have been entered into the database")
+        if telegram:
+            # send results to telegram
+            sent = app.send2tele(telegram[0],telegram[1],output_file)
+            print(f"{sent}")
+            
 
     elif database or telegram:
         print("Error: Output file is required when using -d or -t options.")
