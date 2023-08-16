@@ -15,6 +15,7 @@ from contextlib import redirect_stdout
 
 SHODAN_API_KEY = None
 folder_name = None
+filter_query = None
 
 def bannerner_print():
     figlet_banner = pyfiglet.figlet_format("LARAVELSCRAPER", font='standard')
@@ -38,17 +39,24 @@ def print_help_menu():
 
 def search_shodan(page=1):
     global SHODAN_API_KEY
+    global filter_query
     parser = argparse.ArgumentParser(description="LaravelScraper (by Lodzie Kotekya)")
     parser.add_argument("-k", "--api_key", help="(REQUIRED) Your Shodan API (k)ey. You need one for this to work.", required=True)
     parser.add_argument("-p", "--page", type=int, default=1, help="Determines the page of your results as Shodan only downloads 100 at a time.")
     parser.add_argument("-o", "--output", help="Print everything on the console to a file of your choice.", default=None)
     parser.add_argument("-d", "--database", help="Saves the data into a SQLite DB", default=None)
+    parser.add_argument("-f", "--filter_query", help="Add more query for filtering data", default=None)
     parser.add_argument("-t","--telegram", nargs=2, metavar=("token", "chatid"), help="Sends the hits to your Telegram bot. Please follow -t with your Telegram bot token and your chat ID seperated by a space, this must be used in conjunction with -d")
     args = parser.parse_args()
 
     SHODAN_API_KEY = args.api_key
+    filter_query = args.filter_query;
+
     headers = {"Authorization": f"Bearer {SHODAN_API_KEY}"}
     query = 'http.title:"Whoops! There was an error" http.status:500'
+    if not filter_query is None:
+        query = query +" "+ filter_query
+        print(f'[+] The Query Filterd: {query}');
 
     try:
         if not args.telegram is None:
